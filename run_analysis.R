@@ -82,35 +82,9 @@ names(observations) <- tolower(names(observations)) %>%
                           { gsub("freq", "frequency",.) } %>%
                           { gsub("^f","frequency",.) }
 ##
-##  Now the first table is done
-##  It looks like we don't need to process the raw data so I will comment out this part
+## Now we have to create a summary with the average for each subject, activity and variable
 ##
-##body_acc_x <- rbind(body_acc_x_test,body_acc_x_train) %>%
-##                  mutate(observation_type_id = 1, observation_id = row_number())
-##body_acc_y <- rbind(body_acc_y_test,body_acc_y_train) %>%
-##                  mutate(observation_type_id = 2, observation_id = row_number())
-##body_acc_z <- rbind(body_acc_z_test,body_acc_z_train) %>%
-##                  mutate(observation_type_id = 3, observation_id = row_number())
-##total_acc_x <- rbind(total_acc_x_test,total_acc_x_train) %>%
-##                  mutate(observation_type_id = 4, observation_id = row_number())
-##total_acc_y <- rbind(total_acc_y_test,total_acc_y_train) %>%
-##                  mutate(observation_type_id = 5, observation_id = row_number())
-##total_acc_z <- rbind(total_acc_z_test,total_acc_z_train) %>%
-##                  mutate(observation_type_id = 6, observation_id = row_number())
-##body_gyro_x <- rbind(body_gyro_x_test,body_gyro_x_train) %>%
-##                  mutate(observation_type_id = 7, observation_id = row_number())
-##body_gyro_y <- rbind(body_gyro_y_test,body_gyro_y_train) %>%
-##                  mutate(observation_type_id = 8, observation_id = row_number())
-##body_gyro_z <- rbind(body_gyro_z_test,body_gyro_z_train) %>%
-##                  mutate(observation_type_id = 9, observation_id = row_number())
-##observation_types <- matrix(c(1, 2, 3, 4, 5, 6, 7, 8, 9,
-##                              "body_acc_x", "body_acc_y", "body_acc_z",
-##                              "total_acc_x", "total_acc_y", "total_acc_z",
-##                              "body_gyro_x", "body_gyro_y", "body_gyro_z"
-##                              ), nrow = 9, ncol = 2, byrow = FALSE,
-##                            dimnames = list(NULL,c("observation_type_id","observation_type")))
-##
-## We stack all of the raw observations into one table to simplify and tidy it up
-##
-##raw_observations <- rbind(body_acc_x,body_acc_y,body_acc_z,total_acc_x,total_acc_y,
-##                          total_acc_z,body_gyro_x,body_gyro_y,body_gyro_z)
+observationsummary <- select(observations, -observationid, -set ) %>%
+        gather( key = "measurementtype", value = "measurement", -activitydesc, -subjectid ) %>%
+        group_by(activitydesc, subjectid, measurementtype) %>%
+        summarize( average = mean(measurement))
